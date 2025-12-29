@@ -1,1 +1,127 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stakeholder PI Status Report – KPI Report</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+  <link rel="stylesheet" href="public/tailwind.css">
+  <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/svg2pdf.js@2.2.3/dist/svg2pdf.min.js"></script>
+  <style>
+    html { background: #f7f8fa; }
+    body { background: #f7f8fa; font-family: 'Inter', Arial, sans-serif; margin:0; padding:0; }
+    .main { max-width: 950px; margin: 30px auto; background:#fff; border-radius:18px; padding:36px 32px; box-shadow:0 2px 12px #d1d5db70; }
+    .table-wrap { overflow-x: auto; }
+    table { border-collapse: collapse; min-width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #e5e7eb; padding: 6px 10px; text-align:left; font-size:0.95em; }
+    th { background:#e0e7ef; }
+    .btn { background:#6366f1; color:#fff; border:none; border-radius:6px; padding:7px 18px; cursor:pointer; font-size:1em; }
+    .details-toggle { margin:10px 0 6px 0; }
+    .story-table { border-collapse: collapse; width: 100%; margin: 6px 0 18px 0; }
+    .story-table th, .story-table td { border: 1px solid #e5e7eb; padding: 4px 7px; font-size: 0.95em; text-align:left; }
+    .story-table th { background:#e0e7ef; }
+    .chart-section { margin-top: 30px; overflow-x: auto; }
+    .chart-section canvas { margin-top: 20px; background:#fff; }
+    .chart-section h2 { margin-top: 20px; }
+    .rating-zone-description { margin-top: 10px; font-size: 0.9em; }
+    .rating-zone-description div { margin-top: 4px; }
+    .rating-zone-description span { display:inline-block; width:12px; height:12px; margin-right:6px; vertical-align:middle; }
+    .sprint-item { background:#e5e7eb; border-radius:4px; padding:2px 6px; margin-right:6px; display:inline-block; }
+    .table-description { margin-top:6px; font-size:0.9em; }
+  </style>
+</head>
+<body>
+<div class="main">
+  <h1>KPI Report</h1>
+  <div>
+    <label>Version:
+      <select id="versionSelect" onchange="switchVersion(this.value)">
+        <option value="index.html">Velocity</option>
+        <option value="index_throughput.html">Throughput</option>
+        <option value="index_throughput_week.html">Weekly Throughput</option>
+        <option value="index_disruption.html">Disruption</option>
+        <option value="KPI_Report.html">KPI Report</option>
+        <option value="target_release_dashboard.html">PI &amp; Target-Release Dashboard</option>
+      </select>
+    </label>
+  </div>
+  <div style="margin-top:20px;">
+    <label>Jira Domain: <input id="jiraDomain" value="aldi-sued.atlassian.net" size="28"></label>
+    <label style="margin-left:10px;">Email: <input id="jiraEmail" value="you@example.com" size="22"></label>
+    <label style="margin-left:10px;">API Token: <input id="jiraToken" value="jira_api_token_placeholder_12345" size="28"></label>
+    <label id="boardLabel" style="margin-left:10px; display:none;">Please select a Board:
+      <select id="boardNum" multiple></select>
+    </label>
+    <button id="loadBtn" class="btn" style="display:none;" onclick="loadDisruption()">Load Data</button>
+    <button id="mockBtn" class="btn" type="button">Load Dummy Data</button>
+    <button class="btn" onclick="exportPDF()">Download PDF</button>
+  </div>
+  <div id="pdfOptions" style="margin-top:10px;">
+    <span>Include in PDF:</span>
+    <label style="margin-left:5px;"><input type="checkbox" id="includePi" checked> Initially Planned &amp; Completed</label>
+    <label style="margin-left:5px;"><input type="checkbox" id="includeDisruption" checked> Disruption Chart</label>
+    <label style="margin-left:5px;"><input type="checkbox" id="includeRating" checked> Rating Zone Chart</label>
+    <label style="margin-left:5px;"><input type="checkbox" id="includeThroughput" checked> Throughput Chart</label>
+    <label style="margin-left:5px;"><input type="checkbox" id="includeCycle" checked> Cycle Time Chart</label>
+  </div>
+  <div id="sprintRow" style="margin-top:10px; display:none;">
+    <span>Sprints:</span>
+    <div id="sprintList" style="display:inline-block;"></div>
+  </div>
+  <div id="logPanel" style="display:none; white-space:pre-wrap; font-size:0.85em; background:#f3f4f6; border:1px solid #e5e7eb; padding:6px; margin:10px 0; max-height:150px; overflow:auto;"></div>
+  <div id="pdfContent">
+    <div class="table-wrap">
+      <table>
+      <thead>
+        <tr>
+          <th>Sprint</th>
+          <th>Initially Planned (SP)</th>
+          <th>Completed (SP)</th>
+          <th>Pulled In (SP / Issues)</th>
+          <th>Blocked Days (Days / Issues)</th>
+          <th>Moved Out (SP / Issues)</th>
+          <th>Spillover (SP / Issues)</th>
+          <th>PI Completed (Issues)</th>
+          <th>PI Not Completed (Issues)</th>
+          <th>Other Completed (Issues)</th>
+          <th>Other Not Completed (Issues)</th>
+          <th>Details</th>
+        </tr>
+      </thead>
+      <tbody id="metricsBody"></tbody>
+      </table>
+    </div>
+    <div id="velocityStats"></div>
+    <div id="chartSection" class="chart-section"></div>
+    <template id="ratingZoneTemplate">
+      <div class="rating-zone-description">
+        <div class="rating-zone-toggle" style="cursor:pointer;"><strong>Rating zones (show)</strong></div>
+        <div class="rating-zone-details" style="display:none;">
+          <div><span style="background:rgba(254,249,195,0.5);"></span><strong>Bloated: AV+2SD…∞.</strong> A significant share of this exceedingly high output probably comes from other effects than team performance alone. Analysis is advised because possibly there's something to be learned.</div>
+          <div><span style="background:rgba(34,197,94,0.5);"></span><strong>Lively: AV+1SD…AV+2SD.</strong> The team's performance was outstanding, pushing the envelope on the brink of an unsustainable pace.</div>
+          <div><span style="background:rgba(21,128,61,0.5);"></span><strong>Spot-on: AV…AV+1SD.</strong> The team performed very well while also managing to increase the stability of their long-term output.</div>
+          <div><span style="background:rgba(34,197,94,0.5);"></span><strong>Healthy: AV-1SD…AV.</strong> Things cannot always go up, so going down within the team's usual range of performance is perfectly normal.</div>
+          <div><span style="background:rgba(254,249,195,0.5);"></span><strong>Concerning: AV-2SD…AV-1SD.</strong> Something went considerably wrong, but we're still seeing a robust core performance. Analysis is needed and also some learning that may result in adjustments.</div>
+          <div><span style="background:rgba(254,202,202,0.5);"></span><strong>Alarming: 0…AV-2SD.</strong> The major share of this plummeting output was probably caused by factors beyond the team‘s influence. Thorough analysis is needed which will lead to profound learning and change.</div>
+        </div>
+      </div>
+    </template>
+  </div>
+</div>
+<script src="src/logger.js"></script>
+<script src="src/auth.js"></script>
+<script src="src/jira.js"></script>
+<script src="src/disruption.js"></script>
+<script src="src/kpis.js"></script>
+<script src="src/report-ui.js"></script>
+<script src="src/report-data.js"></script>
+<script src="src/report-charts.js"></script>
+<script src="src/report-pdf.js"></script>
+<script src="src/report-mock.js"></script>
+<script src="src/report.js"></script>
+</body>
+</html>
