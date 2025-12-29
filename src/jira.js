@@ -1,9 +1,10 @@
 const Jira = (() => {
-  function getAuthHeaders() {
-    if (typeof window !== 'undefined' && typeof window.getJiraAuthHeaders === 'function') {
-      return window.getJiraAuthHeaders();
+  function jiraFetch(url, options = {}) {
+    if (typeof window !== 'undefined' && typeof window.jiraFetch === 'function') {
+      return window.jiraFetch(url, options);
     }
-    return { Accept: 'application/json' };
+    const headers = { ...(options.headers || {}), Accept: 'application/json' };
+    return fetch(url, { ...options, headers });
   }
 
   async function fetchBoardsByJql(domain) {
@@ -13,7 +14,7 @@ const Jira = (() => {
     let keepGoing = true;
     while (keepGoing) {
       const url = `https://${domain}/rest/agile/1.0/board?startAt=${startAt}&maxResults=${maxResults}`;
-      const response = await fetch(url, { headers: getAuthHeaders() });
+      const response = await jiraFetch(url);
       if (!response.ok) {
         throw new Error(`Failed to load boards (${response.status})`);
       }
