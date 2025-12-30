@@ -67,10 +67,8 @@ const ReportData = (() => {
 
   async function populateBoards(boardChoices) {
     const domain = document.getElementById('jiraDomain').value.trim();
-    const hasOAuthToken = typeof window.JiraOAuth?.hasValidToken === 'function' ? window.JiraOAuth.hasValidToken() : false;
-    const hasCloud = typeof window.JiraOAuth?.getCloudId === 'function' ? !!(await window.JiraOAuth.getCloudId()) : false;
-    const hasApiToken = typeof window.JiraApiToken?.hasToken === 'function' ? window.JiraApiToken.hasToken() : false;
-    if ((!domain && !hasCloud) || !boardChoices || (!hasOAuthToken && !hasApiToken)) return;
+    const hasPatToken = typeof window.JiraPat?.hasToken === 'function' ? window.JiraPat.hasToken() : false;
+    if (!domain || !boardChoices || !hasPatToken) return;
     try {
       const boards = await Jira.fetchBoardsByJql(domain);
       boardChoices.clearChoices();

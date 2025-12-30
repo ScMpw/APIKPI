@@ -1,12 +1,11 @@
-const JiraApiToken = (() => {
-  const storageKey = 'jiraApiToken';
+const JiraPat = (() => {
+  const storageKey = 'jiraPatToken';
 
   const dom = {
-    email: 'jiraApiEmail',
-    token: 'jiraApiToken',
-    status: 'apiStatus',
-    connect: 'apiConnectBtn',
-    disconnect: 'apiDisconnectBtn'
+    token: 'jiraPatToken',
+    status: 'patStatus',
+    connect: 'patConnectBtn',
+    disconnect: 'patDisconnectBtn'
   };
 
   function parseStored() {
@@ -38,7 +37,7 @@ const JiraApiToken = (() => {
   }
 
   function hasToken(data = parseStored()) {
-    return !!(data.email && data.token);
+    return !!data.token;
   }
 
   function updateStatus(text) {
@@ -59,13 +58,12 @@ const JiraApiToken = (() => {
   }
 
   function connect() {
-    const email = getInputValue(dom.email);
     const token = getInputValue(dom.token);
-    if (!email || !token) {
-      alert('Enter Jira email and API token before saving.');
+    if (!token) {
+      alert('Enter a Jira personal access token before saving.');
       return;
     }
-    store({ email, token });
+    store({ token });
     updateUi();
   }
 
@@ -74,10 +72,10 @@ const JiraApiToken = (() => {
     updateUi();
   }
 
-  function getBasicAuthHeader() {
+  function getBearerHeader() {
     const stored = parseStored();
     if (!hasToken(stored)) return null;
-    return btoa(`${stored.email}:${stored.token}`);
+    return stored.token;
   }
 
   function bindEvents() {
@@ -89,7 +87,6 @@ const JiraApiToken = (() => {
 
   function init() {
     const stored = parseStored();
-    setInputValue(dom.email, stored.email);
     setInputValue(dom.token, stored.token);
     bindEvents();
     updateUi();
@@ -98,17 +95,17 @@ const JiraApiToken = (() => {
   return {
     init,
     hasToken,
-    getBasicAuthHeader,
+    getBearerHeader,
     disconnect
   };
 })();
 
-window.JiraApiToken = JiraApiToken;
+window.JiraPat = JiraPat;
 
 if (typeof window !== 'undefined') {
   window.addEventListener('DOMContentLoaded', () => {
-    if (window.JiraApiToken?.init) {
-      window.JiraApiToken.init();
+    if (window.JiraPat?.init) {
+      window.JiraPat.init();
     }
   });
 }
