@@ -12,11 +12,6 @@ The dashboard talks directly to the Jira Cloud REST APIs from the browser. To lo
 2. Enter the OAuth Client ID and Redirect URI in the UI, then click **Connect**.
 3. Pick the Atlassian site when prompted, then select boards to load.
 
-### Option B: Basic auth (works only when CORS is allowed)
-
-1. Generate an API token in Atlassian and use the email address on your Jira account.
-2. Enter the Jira domain, email, and API token in the UI, then select the boards to load.
-
 ### CORS considerations
 
 Jira Cloud does not allow cross-origin requests from every origin. If board loading fails with a

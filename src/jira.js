@@ -8,11 +8,30 @@ const Jira = (() => {
     return `${base}${path}`;
   }
 
-  function jiraFetch(url, options = {}) {
-    if (typeof window !== 'undefined' && typeof window.jiraFetch === 'function') {
-      return window.jiraFetch(url, options);
+  async function getJiraUrl(domain, path) {
+    if (typeof window !== 'undefined' && window.JiraOAuth?.getCloudId) {
+      const cloudId = await window.JiraOAuth.getCloudId();
+      if (cloudId) {
+        return `https://api.atlassian.com/ex/jira/${cloudId}${path}`;
+      }
     }
-    const headers = { ...(options.headers || {}), Accept: 'application/json' };
+    return buildJiraUrl(domain, path);
+  }
+
+  async function getAuthHeaders() {
+    const headers = { Accept: 'application/json' };
+    if (typeof window !== 'undefined' && window.JiraOAuth?.getAccessToken) {
+      const token = await window.JiraOAuth.getAccessToken();
+      if (token) {
+        headers.Authorization = `Bearer ${token}`;
+      }
+    }
+    return headers;
+  }
+
+  async function jiraFetch(url, options = {}) {
+    const authHeaders = await getAuthHeaders();
+    const headers = { ...authHeaders, ...(options.headers || {}) };
     return fetch(url, { ...options, headers });
   }
 
@@ -22,7 +41,7 @@ const Jira = (() => {
     const maxResults = 50;
     let keepGoing = true;
     while (keepGoing) {
-
+      const url = await getJiraUrl(domain, `/rest/agile/1.0/board?startAt=${startAt}&maxResults=${maxResults}`);
       const response = await jiraFetch(url);
       if (!response.ok) {
         throw new Error(`Failed to load boards (${response.status})`);
@@ -38,6 +57,8 @@ const Jira = (() => {
 
   return {
     buildJiraUrl,
+    getJiraUrl,
+    jiraFetch,
     fetchBoardsByJql
   };
 })();
