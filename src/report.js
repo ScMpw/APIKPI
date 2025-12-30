@@ -41,7 +41,9 @@ const Report = (() => {
     boardLabels = {};
     selected.forEach(b => { boardLabels[b.value] = b.label; });
     if ((!jiraDomain && !hasCloud) || !boards.length || (!hasOAuthToken && !hasApiToken)) {
+ codex/explore-oauth-workaround-for-board-selection-yjifsm
       alert('Enter Jira domain and ensure an API token is configured, then select boards.');
+
       return;
     }
     Logger.info('Loading disruption report for boards', boards.join(','));

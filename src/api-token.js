@@ -2,7 +2,9 @@ const JiraApiToken = (() => {
   const storageKey = 'jiraApiToken';
 
   const dom = {
+codex/explore-oauth-workaround-for-board-selection-yjifsm
     status: 'apiStatus',
+
     disconnect: 'apiDisconnectBtn'
   };
 
@@ -14,10 +16,18 @@ const JiraApiToken = (() => {
     }
   }
 
+
+  function store(next) {
+    localStorage.setItem(storageKey, JSON.stringify(next));
+  }
+
+ main
   function clearStored() {
     localStorage.removeItem(storageKey);
   }
 
+ codex/explore-oauth-workaround-for-board-selection-yjifsm
+ main
   function hasToken(data = parseStored()) {
     return !!(data.email && data.token);
   }
@@ -32,7 +42,9 @@ const JiraApiToken = (() => {
   function updateUi() {
     const stored = parseStored();
     const connected = hasToken(stored);
+ codex/explore-oauth-workaround-for-board-selection-yjifsm
     const disconnectBtn = document.getElementById(dom.disconnect);
+main
     if (disconnectBtn) disconnectBtn.disabled = !connected;
     updateStatus(connected ? 'Connected' : 'Not connected');
   }
@@ -49,6 +61,7 @@ const JiraApiToken = (() => {
   }
 
   function bindEvents() {
+
     const disconnectBtn = document.getElementById(dom.disconnect);
     if (disconnectBtn) disconnectBtn.addEventListener('click', disconnect);
   }
