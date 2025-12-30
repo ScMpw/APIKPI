@@ -49,7 +49,7 @@ const ReportData = (() => {
   async function getEpicInfo(domain, epicKey) {
     let cached = epicCache.get(epicKey);
     if (cached) return cached;
-    const url = await window.buildJiraUrl(domain, `/rest/api/3/issue/${epicKey}?fields=issuetype,labels`);
+
     const r = await window.jiraFetch(url);
     if (!r.ok) return null;
     const j = await r.json();
@@ -106,7 +106,7 @@ const ReportData = (() => {
       const fetchBoards = Array.from(new Set(uniqueBoards));
       await runBatches(fetchBoards, 3, async boardNum => {
         const boardKey = boardNum;
-        const url = await window.buildJiraUrl(jiraDomain, `/rest/greenhopper/1.0/rapid/charts/velocity?rapidViewId=${boardNum}`);
+
         const isBfBoard = ['6347', '6390'].includes(String(boardNum));
         const resp = await window.jiraFetch(url);
         let data = {};
@@ -126,7 +126,7 @@ const ReportData = (() => {
           const maxResults = 50;
           let loops = 0;
           while (true) {
-            const sUrl = await window.buildJiraUrl(jiraDomain, `/rest/agile/1.0/board/${boardNum}/sprint?state=closed&maxResults=${maxResults}&startAt=${startAt}`);
+     main
             const sResp = await window.jiraFetch(sUrl);
             if (!sResp.ok) {
               Logger.error('Failed to fetch sprint list', sResp.status);
@@ -147,7 +147,7 @@ const ReportData = (() => {
         closed = filterRecentSprints(closed, [], constants.displaySprintCount + constants.ratingWindow);
 
         await runBatches(closed, 2, async s => {
-          const surl = await window.buildJiraUrl(jiraDomain, `/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=${boardNum}&sprintId=${s.id}`);
+
           try {
             const r = await window.jiraFetch(surl);
             if (!r.ok) return;
@@ -205,7 +205,7 @@ const ReportData = (() => {
                 if (cached) {
                   ({ histories, currentStatus, created, resolutionDate, piRelevant, parentKey } = cached);
                 } else {
-                  const u = await window.buildJiraUrl(
+
                     jiraDomain,
                     `/rest/api/3/issue/${ev.key}?expand=changelog&fields=flagged,status,created,resolutiondate,labels,parent,customfield_10002`
                   );

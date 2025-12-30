@@ -1,4 +1,13 @@
 const Jira = (() => {
+  const apiBaseOverride = typeof window !== 'undefined' ? (window.JIRA_API_BASE || '') : '';
+
+  function buildJiraUrl(domain, path) {
+    const base = apiBaseOverride
+      ? String(apiBaseOverride).replace(/\/$/, '')
+      : `https://${domain}`;
+    return `${base}${path}`;
+  }
+
   function jiraFetch(url, options = {}) {
     if (typeof window !== 'undefined' && typeof window.jiraFetch === 'function') {
       return window.jiraFetch(url, options);
@@ -13,7 +22,7 @@ const Jira = (() => {
     const maxResults = 50;
     let keepGoing = true;
     while (keepGoing) {
-      const url = await window.buildJiraUrl(domain, `/rest/agile/1.0/board?startAt=${startAt}&maxResults=${maxResults}`);
+
       const response = await jiraFetch(url);
       if (!response.ok) {
         throw new Error(`Failed to load boards (${response.status})`);
@@ -28,6 +37,7 @@ const Jira = (() => {
   }
 
   return {
+    buildJiraUrl,
     fetchBoardsByJql
   };
 })();

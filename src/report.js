@@ -173,16 +173,7 @@ const Report = (() => {
     const boardSelect = document.getElementById('boardNum');
     boardChoices = new Choices(boardSelect, { removeItemButton: true });
 
-    if (window.JiraOAuth?.init) {
-      window.JiraOAuth.init();
-      window.addEventListener('jira-auth-changed', () => ReportData.populateBoards(boardChoices));
-    }
-
-    document.getElementById('jiraDomain').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-    document.getElementById('jiraEmail').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-    document.getElementById('jiraToken').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-
-    ReportData.populateBoards(boardChoices);
+ main
 
     const mockButton = document.getElementById('mockBtn');
     if (mockButton) {
