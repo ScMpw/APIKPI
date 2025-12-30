@@ -14,9 +14,9 @@ const JiraOAuth = (() => {
 
   const defaultScopes = [
     'read:jira-work',
-    'read:jira-user',
-    'read:board-scope',
-    'read:sprint-scope'
+    'read:user:jira',
+    'read:board-scope:jira-software',
+    'read:sprint:jira-software'
   ];
 
   function parseStored() {
