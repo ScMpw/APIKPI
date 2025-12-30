@@ -15,6 +15,10 @@ const ReportData = (() => {
 
   let epicCache = new Map();
 
+  async function buildJiraUrl(domain, path) {
+    return Jira.getJiraUrl(domain, path);
+  }
+
   function extractSprintKey(name) {
     const m = (name || '').match(constants.sprintKeyRe);
     if (!m) return name;
@@ -50,7 +54,8 @@ const ReportData = (() => {
     let cached = epicCache.get(epicKey);
     if (cached) return cached;
 
-    const r = await window.jiraFetch(url);
+    const url = await buildJiraUrl(domain, `/rest/api/3/issue/${epicKey}?fields=issuetype,labels`);
+    const r = await Jira.jiraFetch(url);
     if (!r.ok) return null;
     const j = await r.json();
     const isEpic = (j.fields?.issuetype?.name || '').toLowerCase() === 'epic';
@@ -62,12 +67,9 @@ const ReportData = (() => {
 
   async function populateBoards(boardChoices) {
     const domain = document.getElementById('jiraDomain').value.trim();
-    const email = document.getElementById('jiraEmail')?.value.trim();
-    const token = document.getElementById('jiraToken')?.value.trim();
-    const hasBasicAuth = !!(email && token);
     const hasOAuthToken = typeof window.JiraOAuth?.hasValidToken === 'function' ? window.JiraOAuth.hasValidToken() : false;
-    const hasCloud = typeof window.hasJiraCloudId === 'function' ? await window.hasJiraCloudId() : false;
-    if ((!domain && !hasCloud) || !boardChoices || (!hasBasicAuth && !hasOAuthToken)) return;
+    const hasCloud = typeof window.JiraOAuth?.getCloudId === 'function' ? !!(await window.JiraOAuth.getCloudId()) : false;
+    if ((!domain && !hasCloud) || !boardChoices || !hasOAuthToken) return;
     try {
       const boards = await Jira.fetchBoardsByJql(domain);
       boardChoices.clearChoices();
@@ -108,7 +110,11 @@ const ReportData = (() => {
         const boardKey = boardNum;
 
         const isBfBoard = ['6347', '6390'].includes(String(boardNum));
-        const resp = await window.jiraFetch(url);
+        const velocityUrl = await buildJiraUrl(
+          jiraDomain,
+          `/rest/greenhopper/1.0/rapid/charts/velocity?rapidViewId=${boardNum}`
+        );
+        const resp = await Jira.jiraFetch(velocityUrl);
         let data = {};
         if (resp.ok) {
           data = await resp.json();
@@ -126,8 +132,11 @@ const ReportData = (() => {
           const maxResults = 50;
           let loops = 0;
           while (true) {
-     main
-            const sResp = await window.jiraFetch(sUrl);
+            const sUrl = await buildJiraUrl(
+              jiraDomain,
+              `/rest/agile/1.0/board/${boardNum}/sprint?state=active,closed&startAt=${startAt}&maxResults=${maxResults}`
+            );
+            const sResp = await Jira.jiraFetch(sUrl);
             if (!sResp.ok) {
               Logger.error('Failed to fetch sprint list', sResp.status);
               break;
@@ -149,7 +158,11 @@ const ReportData = (() => {
         await runBatches(closed, 2, async s => {
 
           try {
-            const r = await window.jiraFetch(surl);
+            const sprintReportUrl = await buildJiraUrl(
+              jiraDomain,
+              `/rest/greenhopper/1.0/rapid/charts/sprintreport?rapidViewId=${boardNum}&sprintId=${s.id}`
+            );
+            const r = await Jira.jiraFetch(sprintReportUrl);
             if (!r.ok) return;
             const d = await r.json();
             let events = [];
@@ -205,11 +218,11 @@ const ReportData = (() => {
                 if (cached) {
                   ({ histories, currentStatus, created, resolutionDate, piRelevant, parentKey } = cached);
                 } else {
-
+                  const u = await buildJiraUrl(
                     jiraDomain,
                     `/rest/api/3/issue/${ev.key}?expand=changelog&fields=flagged,status,created,resolutiondate,labels,parent,customfield_10002`
                   );
-                  const ir = await window.jiraFetch(u);
+                  const ir = await Jira.jiraFetch(u);
                   if (!ir.ok) return;
                   const id = await ir.json();
                   histories = id.changelog?.histories || [];

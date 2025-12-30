@@ -33,7 +33,7 @@ const Report = (() => {
 
   async function loadDisruption() {
     const jiraDomain = document.getElementById('jiraDomain').value.trim();
-    const hasCloud = typeof window.hasJiraCloudId === 'function' ? await window.hasJiraCloudId() : false;
+    const hasCloud = typeof window.JiraOAuth?.getCloudId === 'function' ? !!(await window.JiraOAuth.getCloudId()) : false;
     const selected = boardChoices ? boardChoices.getValue() : [];
     const boards = selected.map(b => b.value);
     boardLabels = {};
@@ -172,8 +172,6 @@ const Report = (() => {
 
     const boardSelect = document.getElementById('boardNum');
     boardChoices = new Choices(boardSelect, { removeItemButton: true });
-
- main
 
     const mockButton = document.getElementById('mockBtn');
     if (mockButton) {
