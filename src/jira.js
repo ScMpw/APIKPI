@@ -24,6 +24,13 @@ const Jira = (() => {
       const token = await window.JiraOAuth.getAccessToken();
       if (token) {
         headers.Authorization = `Bearer ${token}`;
+        return headers;
+      }
+    }
+    if (typeof window !== 'undefined' && window.JiraApiToken?.getBasicAuthHeader) {
+      const basicToken = window.JiraApiToken.getBasicAuthHeader();
+      if (basicToken) {
+        headers.Authorization = `Basic ${basicToken}`;
       }
     }
     return headers;

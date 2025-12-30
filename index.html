@@ -59,6 +59,14 @@
       <button id="oauthDisconnectBtn" class="btn" type="button">Disconnect</button>
       <span id="oauthStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
     </div>
+    <div style="margin-bottom:10px;">
+      <strong>API Token (basic auth)</strong>
+      <label style="margin-left:10px;">Email: <input id="jiraApiEmail" placeholder="name@example.com" size="28"></label>
+      <label style="margin-left:10px;">API Token: <input id="jiraApiToken" type="password" size="32"></label>
+      <button id="apiConnectBtn" class="btn" type="button">Save</button>
+      <button id="apiDisconnectBtn" class="btn" type="button">Clear</button>
+      <span id="apiStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
+    </div>
     <div id="jiraSiteRow" style="margin-bottom:10px; display:none;">
       <label>Atlassian Site:
         <select id="jiraSiteSelect"></select>
@@ -127,6 +135,7 @@
 </div>
 <script src="src/logger.js"></script>
 <script src="src/oauth.js"></script>
+<script src="src/api-token.js"></script>
 <script src="src/jira.js"></script>
 <script src="src/disruption.js"></script>
 <script src="src/kpis.js"></script>
