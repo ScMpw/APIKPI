@@ -105,11 +105,10 @@ const JiraOAuth = (() => {
   }
 
   function buildAuthUrl({ clientId, redirectUri, scopes, state, codeChallenge }) {
-    const scopeParam = encodeURIComponent(scopes.join(' '));
     const params = new URLSearchParams({
       audience: 'api.atlassian.com',
       client_id: clientId,
-      scope: scopeParam,
+      scope: scopes.join(' '),
       redirect_uri: redirectUri,
       state,
       response_type: 'code',
