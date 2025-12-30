@@ -59,6 +59,36 @@
       <span id="patStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
     </div>
     <div class="table-description">Saved tokens stay in your browser storage and are only sent to Jira API calls.</div>
+    <div id="patHelper" style="margin:12px 0 16px 0; padding:12px; border:1px solid #e5e7eb; border-radius:10px; background:#f9fafb;">
+      <div style="font-weight:600; margin-bottom:6px;">PAT REST API helper</div>
+      <div class="table-description">Auto-fills the REST request details based on your Jira domain.</div>
+      <div style="margin-top:8px;">
+        <label>Base URL: <input id="patBaseUrl" size="36" placeholder="https://your-domain.atlassian.net"></label>
+        <label style="margin-left:10px;">Token name: <input id="patTokenName" size="18" value="kpi-dashboard"></label>
+        <label style="margin-left:10px;">Expiration days: <input id="patExpirationDays" type="number" min="1" size="6" placeholder="optional"></label>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-weight:600;">Endpoint</div>
+        <input id="patEndpoint" size="80" readonly>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-weight:600;">JSON body</div>
+        <textarea id="patJsonBody" rows="3" cols="80" readonly></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-weight:600;">cURL (Basic auth)</div>
+        <textarea id="patCurlBasic" rows="3" cols="80" readonly></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-weight:600;">cURL (PAT auth)</div>
+        <textarea id="patCurlPat" rows="3" cols="80" readonly></textarea>
+      </div>
+      <div style="margin-top:10px;">
+        <div style="font-weight:600;">System properties for PATs</div>
+        <ul id="patSystemProps" style="margin:6px 0 0 18px;"></ul>
+        <div class="table-description">Property names vary by product/version—verify against your Jira/Confluence documentation.</div>
+      </div>
+    </div>
     <label>Jira Domain: <input id="jiraDomain" value="aldi-sued.atlassian.net" size="28"></label>
 
     <label id="boardLabel" style="margin-left:10px; display:none;">Please select a Board:
