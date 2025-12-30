@@ -33,12 +33,13 @@ const Report = (() => {
 
   async function loadDisruption() {
     const jiraDomain = document.getElementById('jiraDomain').value.trim();
+    const hasCloud = typeof window.hasJiraCloudId === 'function' ? await window.hasJiraCloudId() : false;
     const selected = boardChoices ? boardChoices.getValue() : [];
     const boards = selected.map(b => b.value);
     boardLabels = {};
     selected.forEach(b => { boardLabels[b.value] = b.label; });
-    if (!jiraDomain || !boards.length) {
-      alert('Enter Jira domain and select boards.');
+    if ((!jiraDomain && !hasCloud) || !boards.length) {
+      alert('Enter Jira domain or connect via OAuth, then select boards.');
       return;
     }
     Logger.info('Loading disruption report for boards', boards.join(','));
@@ -172,10 +173,7 @@ const Report = (() => {
     const boardSelect = document.getElementById('boardNum');
     boardChoices = new Choices(boardSelect, { removeItemButton: true });
 
-    const loadBoardsBtn = document.getElementById('loadBoardsBtn');
-    if (loadBoardsBtn) {
-      loadBoardsBtn.addEventListener('click', () => ReportData.populateBoards(boardChoices));
-    }
+ main
 
     const mockButton = document.getElementById('mockBtn');
     if (mockButton) {

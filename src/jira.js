@@ -22,7 +22,7 @@ const Jira = (() => {
     const maxResults = 50;
     let keepGoing = true;
     while (keepGoing) {
-      const url = buildJiraUrl(domain, `/rest/agile/1.0/board?startAt=${startAt}&maxResults=${maxResults}`);
+
       const response = await jiraFetch(url);
       if (!response.ok) {
         throw new Error(`Failed to load boards (${response.status})`);
