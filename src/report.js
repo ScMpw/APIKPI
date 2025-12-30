@@ -34,12 +34,14 @@ const Report = (() => {
   async function loadDisruption() {
     const jiraDomain = document.getElementById('jiraDomain').value.trim();
     const hasCloud = typeof window.JiraOAuth?.getCloudId === 'function' ? !!(await window.JiraOAuth.getCloudId()) : false;
+    const hasOAuthToken = typeof window.JiraOAuth?.hasValidToken === 'function' ? window.JiraOAuth.hasValidToken() : false;
+    const hasApiToken = typeof window.JiraApiToken?.hasToken === 'function' ? window.JiraApiToken.hasToken() : false;
     const selected = boardChoices ? boardChoices.getValue() : [];
     const boards = selected.map(b => b.value);
     boardLabels = {};
     selected.forEach(b => { boardLabels[b.value] = b.label; });
-    if ((!jiraDomain && !hasCloud) || !boards.length) {
-      alert('Enter Jira domain or connect via OAuth, then select boards.');
+    if ((!jiraDomain && !hasCloud) || !boards.length || (!hasOAuthToken && !hasApiToken)) {
+      alert('Enter Jira domain with API token or connect via OAuth, then select boards.');
       return;
     }
     Logger.info('Loading disruption report for boards', boards.join(','));
