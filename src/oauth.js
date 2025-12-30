@@ -68,6 +68,36 @@ const JiraOAuth = (() => {
     return `${window.location.origin}${window.location.pathname}`;
   }
 
+  function isLocalhost(hostname) {
+    return hostname === 'localhost' || hostname === '127.0.0.1' || hostname === '[::1]';
+  }
+
+  function validateRedirectUri(inputValue) {
+    const computed = buildRedirectUri();
+    const redirectUri = inputValue || computed;
+    if (!redirectUri) {
+      return { ok: false, message: 'Enter a redirect URI that matches the app configuration.' };
+    }
+    try {
+      const url = new URL(redirectUri);
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        return { ok: false, message: 'Redirect URI must use http or https. Hosting from file:// is not supported.' };
+      }
+      if (url.protocol === 'http:' && !isLocalhost(url.hostname)) {
+        return { ok: false, message: 'Use https for non-localhost redirect URIs.' };
+      }
+    } catch (e) {
+      return { ok: false, message: 'Redirect URI is not a valid URL.' };
+    }
+    if (computed && redirectUri !== computed) {
+      return {
+        ok: false,
+        message: `Redirect URI must exactly match the current page URL: ${computed}`
+      };
+    }
+    return { ok: true, redirectUri };
+  }
+
   function setAutoRedirectUri() {
     const el = document.getElementById(dom.redirectUri);
     if (!el) return;
@@ -127,15 +157,16 @@ const JiraOAuth = (() => {
 
   async function startAuthFlow() {
     const clientId = getInputValue(dom.clientId);
-    const redirectUri = getInputValue(dom.redirectUri) || buildRedirectUri();
     if (!clientId) {
       alert('Enter your Atlassian OAuth Client ID.');
       return;
     }
-    if (!redirectUri) {
-      alert('Enter a redirect URI that matches the app configuration.');
+    const redirectCheck = validateRedirectUri(getInputValue(dom.redirectUri));
+    if (!redirectCheck.ok) {
+      alert(redirectCheck.message);
       return;
     }
+    const redirectUri = redirectCheck.redirectUri;
 
     const verifier = generateCodeVerifier();
     const state = crypto.randomUUID();
