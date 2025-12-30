@@ -52,17 +52,9 @@
   </div>
   <div style="margin-top:20px;">
     <div style="margin-bottom:10px;">
-      <strong>OAuth (browser-friendly)</strong>
-      <label style="margin-left:10px;">Client ID: <input id="jiraClientId" placeholder="Atlassian OAuth client ID" size="28"></label>
-      <label style="margin-left:10px;">Redirect URI: <input id="jiraRedirect" size="32"></label>
-      <button id="oauthConnectBtn" class="btn" type="button">Connect</button>
-      <button id="oauthDisconnectBtn" class="btn" type="button">Disconnect</button>
-      <span id="oauthStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
-    </div>
-    <div id="jiraSiteRow" style="margin-bottom:10px; display:none;">
-      <label>Atlassian Site:
-        <select id="jiraSiteSelect"></select>
-      </label>
+      <strong>API Token (basic auth)</strong>
+      <span id="apiStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
+      <button id="apiDisconnectBtn" class="btn" type="button">Clear</button>
     </div>
     <label>Jira Domain: <input id="jiraDomain" value="aldi-sued.atlassian.net" size="28"></label>
 
@@ -127,6 +119,7 @@
 </div>
 <script src="src/logger.js"></script>
 <script src="src/oauth.js"></script>
+<script src="src/api-token.js"></script>
 <script src="src/jira.js"></script>
 <script src="src/disruption.js"></script>
 <script src="src/kpis.js"></script>
