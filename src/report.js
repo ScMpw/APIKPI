@@ -172,11 +172,10 @@ const Report = (() => {
     const boardSelect = document.getElementById('boardNum');
     boardChoices = new Choices(boardSelect, { removeItemButton: true });
 
-    document.getElementById('jiraDomain').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-    document.getElementById('jiraEmail').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-    document.getElementById('jiraToken').addEventListener('change', () => ReportData.populateBoards(boardChoices));
-
-    ReportData.populateBoards(boardChoices);
+    const loadBoardsBtn = document.getElementById('loadBoardsBtn');
+    if (loadBoardsBtn) {
+      loadBoardsBtn.addEventListener('click', () => ReportData.populateBoards(boardChoices));
+    }
 
     const mockButton = document.getElementById('mockBtn');
     if (mockButton) {
