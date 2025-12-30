@@ -33,13 +33,22 @@ const Report = (() => {
 
   async function loadDisruption() {
     const jiraDomain = document.getElementById('jiraDomain').value.trim();
-    const hasPatToken = typeof window.JiraPat?.hasToken === 'function' ? window.JiraPat.hasToken() : false;
+    const hasOAuth = typeof window.JiraOAuth?.hasToken === 'function' ? window.JiraOAuth.hasToken() : false;
+    const hasSite = typeof window.JiraOAuth?.hasSite === 'function' ? window.JiraOAuth.hasSite() : false;
     const selected = boardChoices ? boardChoices.getValue() : [];
     const boards = selected.map(b => b.value);
     boardLabels = {};
     selected.forEach(b => { boardLabels[b.value] = b.label; });
-    if (!jiraDomain || !boards.length || !hasPatToken) {
-      alert('Enter Jira domain and personal access token, then select boards.');
+    if (!hasOAuth) {
+      alert('Connect with Jira OAuth before loading data.');
+      return;
+    }
+    if (!jiraDomain && !hasSite) {
+      alert('Enter Jira domain (or pick a site during OAuth consent) before loading data.');
+      return;
+    }
+    if (!boards.length) {
+      alert('Select at least one board.');
       return;
     }
     Logger.info('Loading disruption report for boards', boards.join(','));
