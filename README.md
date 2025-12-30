@@ -6,7 +6,7 @@ This repository hosts the static KPI report dashboard used to pull Jira metrics 
 
 The dashboard talks directly to the Jira Cloud REST APIs from the browser. To load live data:
 
-### Option A: OAuth 2.0 (recommended for browser-hosted sites)
+### OAuth 2.0 (3LO)
 
 1. Create an Atlassian OAuth 2.0 (3LO) app and add the dashboard URL as a redirect URI.
 2. Enter the OAuth Client ID and Redirect URI in the UI, then click **Connect**.

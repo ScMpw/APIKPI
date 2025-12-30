@@ -1,7 +1,19 @@
 const Jira = (() => {
   const apiBaseOverride = typeof window !== 'undefined' ? (window.JIRA_API_BASE || '') : '';
 
+  function getOAuthBase() {
+    if (typeof window !== 'undefined' && window.JiraOAuth?.getApiBase) {
+      const base = window.JiraOAuth.getApiBase();
+      if (base) return base;
+    }
+    return '';
+  }
+
   function buildJiraUrl(domain, path) {
+    const oauthBase = getOAuthBase();
+    if (oauthBase) {
+      return `${oauthBase}${path}`;
+    }
     const base = apiBaseOverride
       ? String(apiBaseOverride).replace(/\/$/, '')
       : `https://${domain}`;
@@ -14,8 +26,8 @@ const Jira = (() => {
 
   async function getAuthHeaders() {
     const headers = { Accept: 'application/json' };
-    if (typeof window !== 'undefined' && window.JiraPat?.getBearerHeader) {
-      const token = window.JiraPat.getBearerHeader();
+    if (typeof window !== 'undefined' && window.JiraOAuth?.getAccessToken) {
+      const token = await window.JiraOAuth.getAccessToken();
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
