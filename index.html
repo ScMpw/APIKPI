@@ -59,6 +59,12 @@
       <button id="oauthDisconnectBtn" class="btn" type="button">Disconnect</button>
       <span id="oauthStatus" style="margin-left:10px; font-weight:600;">Not connected</span>
     </div>
+    <div class="table-description">Your Atlassian app Redirect URI must exactly match the hosted dashboard URL (including the trailing slash) to avoid <code>invalid_request</code>.</div>
+    <div style="margin-bottom:10px;">
+      <label>Computed Redirect URI:
+        <input id="jiraRedirectUriPreview" size="52" readonly>
+      </label>
+    </div>
     <div class="table-description">Scopes (space-separated) must be enabled on your app.</div>
     <div style="margin-bottom:10px;">
       <label>Scopes:

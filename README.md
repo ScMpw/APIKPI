@@ -8,6 +8,7 @@ The dashboard talks directly to the Jira Cloud REST APIs from the browser. To lo
 
 ### OAuth 2.0 (3LO)
 
+
 1. Create an Atlassian OAuth 2.0 (3LO) app and add the dashboard URL as a redirect URI.
    Ensure the scopes in the UI match the granular scopes configured on the Atlassian app, or the
    authorize request will fail with `invalid_request`.

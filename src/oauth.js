@@ -5,6 +5,7 @@ const JiraOAuth = (() => {
   const dom = {
     clientId: 'jiraClientId',
     redirectUri: 'jiraRedirectUri',
+    redirectUriPreview: 'jiraRedirectUriPreview',
     status: 'oauthStatus',
     connect: 'oauthConnectBtn',
     disconnect: 'oauthDisconnectBtn',
@@ -75,6 +76,10 @@ const JiraOAuth = (() => {
     if (!el.value || el.value === lastAuto) {
       el.value = nextAuto;
       el.dataset.autoValue = nextAuto;
+    }
+    const preview = document.getElementById(dom.redirectUriPreview);
+    if (preview) {
+      preview.value = nextAuto;
     }
   }
 
@@ -261,8 +266,7 @@ const JiraOAuth = (() => {
       updateStatus(e.message || 'OAuth failed');
     } finally {
       sessionStorage.removeItem(sessionKey);
-      const newUrl = `${window.location.origin}${window.location.pathname}`;
-      window.history.replaceState({}, document.title, newUrl);
+      window.history.replaceState({}, document.title, buildRedirectUri());
     }
   }
 
